@@ -9,6 +9,7 @@
 
 #include "ompi_config.h"
 #include "coll_hcoll.h"
+#include "coll_hcoll_dtypes.h"
 
 int hcoll_comm_attr_keyval;
 
@@ -353,6 +354,7 @@ mca_coll_hcoll_comm_query(struct ompi_communicator_t *comm, int *priority)
 
     if (!cm->libhcoll_initialized) {
         cm->libhcoll_initialized = true;
+        ompi_datatype_create_struct_hook_register(hcoll_dtype_create_struct_hook);
     }
 
     return module;
