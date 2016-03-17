@@ -177,6 +177,7 @@ ompi_datatype_duplicate( const ompi_datatype_t* oldType, ompi_datatype_t** newTy
 OMPI_DECLSPEC int32_t ompi_datatype_create_contiguous( int count, const ompi_datatype_t* oldType, ompi_datatype_t** newType );
 OMPI_DECLSPEC int32_t ompi_datatype_create_vector( int count, int bLength, int stride,
                                                    const ompi_datatype_t* oldType, ompi_datatype_t** newType );
+
 OMPI_DECLSPEC int32_t ompi_datatype_create_hvector( int count, int bLength, OPAL_PTRDIFF_TYPE stride,
                                                     const ompi_datatype_t* oldType, ompi_datatype_t** newType );
 OMPI_DECLSPEC int32_t ompi_datatype_create_indexed( int count, const int* pBlockLength, const int* pDisp,
@@ -189,11 +190,16 @@ OMPI_DECLSPEC int32_t ompi_datatype_create_hindexed_block( int count, int bLengt
                                                            const ompi_datatype_t* oldType, ompi_datatype_t** newType );
 OMPI_DECLSPEC int32_t ompi_datatype_create_struct( int count, const int* pBlockLength, const OPAL_PTRDIFF_TYPE* pDisp,
                                                    ompi_datatype_t* const* pTypes, ompi_datatype_t** newType );
+
+/* datatype create hooks allow other modules to intercept user call and do extra dtype handling */
 typedef int32_t (*ompi_datatype_create_struct_hook_fn_t)( int count, const int* pBlockLength, const OPAL_PTRDIFF_TYPE* pDisp,
                                                           ompi_datatype_t* const* pTypes, ompi_datatype_t* newType );
-
+typedef int32_t (*ompi_datatype_create_vector_hook_fn_t)( int count, int bLength, int stride,
+                                                          const ompi_datatype_t* oldType, ompi_datatype_t* newType );
 OMPI_DECLSPEC int32_t ompi_datatype_create_struct_hook_register(ompi_datatype_create_struct_hook_fn_t hook);
 OMPI_DECLSPEC int32_t ompi_datatype_create_struct_hook_deregister(ompi_datatype_create_struct_hook_fn_t hook);
+OMPI_DECLSPEC int32_t ompi_datatype_create_vector_hook_register(ompi_datatype_create_vector_hook_fn_t hook);
+OMPI_DECLSPEC int32_t ompi_datatype_create_vector_hook_deregister(ompi_datatype_create_vector_hook_fn_t hook);
 
 OMPI_DECLSPEC int32_t ompi_datatype_create_darray( int size, int rank, int ndims, int const* gsize_array,
                                                    int const* distrib_array, int const* darg_array,

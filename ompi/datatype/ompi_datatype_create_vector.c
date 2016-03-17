@@ -31,6 +31,26 @@
  *    can be ONLY a initial solution.
  *
  */
+static ompi_datatype_create_vector_hook_fn_t create_vector_hook = NULL;
+int32_t ompi_datatype_create_vector_hook_register(ompi_datatype_create_vector_hook_fn_t hook)
+{
+    create_vector_hook = hook;
+    return OMPI_SUCCESS;
+}
+
+int32_t ompi_datatype_create_vector_hook_deregister(ompi_datatype_create_vector_hook_fn_t hook)
+{
+    create_vector_hook = NULL;
+    return OMPI_SUCCESS;
+}
+
+static inline int32_t ompi_datatype_create_vector_call_hooks( int count, int bLength, int stride,
+                                                              const ompi_datatype_t* oldType, ompi_datatype_t* newType )
+{
+    if (create_vector_hook)
+        create_vector_hook(count, bLength, stride, oldType, newType);
+    return OMPI_SUCCESS;
+}
 
 int32_t ompi_datatype_create_vector( int count, int bLength, int stride,
                                      const ompi_datatype_t* oldType, ompi_datatype_t** newType )
@@ -59,6 +79,8 @@ int32_t ompi_datatype_create_vector( int count, int bLength, int stride,
             OBJ_RELEASE( pTempData );
         }
     }
+
+    ompi_datatype_create_vector_call_hooks(count, bLength, stride, oldType, pData);
     *newType = pData;
     return OMPI_SUCCESS;
 }
