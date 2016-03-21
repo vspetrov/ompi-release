@@ -36,6 +36,7 @@
 
 #include "ompi/constants.h"
 #include "opal/datatype/opal_convertor.h"
+#include "opal/class/opal_list.h"
 #include "mpi.h"
 
 BEGIN_C_DECLS
@@ -192,18 +193,77 @@ OMPI_DECLSPEC int32_t ompi_datatype_create_struct( int count, const int* pBlockL
                                                    ompi_datatype_t* const* pTypes, ompi_datatype_t** newType );
 
 /* datatype create hooks allow other modules to intercept user call and do extra dtype handling */
+typedef enum {
+    OMPI_DATATYPE_HOOK_VECTOR,
+    OMPI_DATATYPE_HOOK_STRUCT,
+    OMPI_DATATYPE_HOOK_DESTROY,
+    OMPI_DATATYPE_HOOK_NUM
+} ompi_datatype_hook_type_t;
+
+int32_t ompi_datatype_register_hook(ompi_datatype_hook_type_t hook_type, uint64_t hook);
+int32_t ompi_datatype_deregister_hook(ompi_datatype_hook_type_t hook_type, uint64_t hook);
+
+struct ompi_datatype_hooks{
+    opal_list_t hooks[OMPI_DATATYPE_HOOK_NUM];
+};
+extern struct ompi_datatype_hooks ompi_datatype_hooks;
+
+typedef struct ompi_datatype_hook_item_t {
+    opal_list_item_t super;
+    uint64_t hook;
+} ompi_datatype_hook_item_t;
+
+OBJ_CLASS_DECLARATION(ompi_datatype_hook_item_t);
+
+#define  OMPI_DATATYPE_CALL_HOOKS(__hook_id, __hook_fn_type, ...) do{   \
+        opal_list_item_t *item;                                         \
+        opal_list_t *hooks_list = &ompi_datatype_hooks.hooks[__hook_id]; \
+        for (item = opal_list_get_first(hooks_list);                    \
+             item && (item != opal_list_get_end(hooks_list));           \
+             item = opal_list_get_next(item)) {                         \
+            __hook_fn_type __hook_fn = (__hook_fn_type)                 \
+                ((ompi_datatype_hook_item_t *)item)->hook;              \
+            __hook_fn(__VA_ARGS__);                                     \
+        }                                                               \
+    }while(0)
+
 typedef int32_t (*ompi_datatype_create_struct_hook_fn_t)( int count, const int* pBlockLength, const OPAL_PTRDIFF_TYPE* pDisp,
                                                           ompi_datatype_t* const* pTypes, ompi_datatype_t* newType );
 typedef int32_t (*ompi_datatype_create_vector_hook_fn_t)( int count, int bLength, int stride,
                                                           const ompi_datatype_t* oldType, ompi_datatype_t* newType );
 typedef int32_t (*ompi_datatype_destroy_hook_fn_t)( ompi_datatype_t* type );
 
-OMPI_DECLSPEC int32_t ompi_datatype_create_struct_hook_register(ompi_datatype_create_struct_hook_fn_t hook);
-OMPI_DECLSPEC int32_t ompi_datatype_create_struct_hook_deregister(ompi_datatype_create_struct_hook_fn_t hook);
-OMPI_DECLSPEC int32_t ompi_datatype_create_vector_hook_register(ompi_datatype_create_vector_hook_fn_t hook);
-OMPI_DECLSPEC int32_t ompi_datatype_create_vector_hook_deregister(ompi_datatype_create_vector_hook_fn_t hook);
-OMPI_DECLSPEC int32_t ompi_datatype_destroy_hook_register  (ompi_datatype_destroy_hook_fn_t hook);
-OMPI_DECLSPEC int32_t ompi_datatype_destroy_hook_deregister(ompi_datatype_destroy_hook_fn_t hook);
+static inline int32_t
+ompi_datatype_create_struct_hook_register(ompi_datatype_create_struct_hook_fn_t hook)
+{
+    return ompi_datatype_register_hook(OMPI_DATATYPE_HOOK_STRUCT, (uint64_t)hook);
+}
+static inline int32_t
+ompi_datatype_create_struct_hook_deregister(ompi_datatype_create_struct_hook_fn_t hook)
+{
+    return ompi_datatype_deregister_hook(OMPI_DATATYPE_HOOK_STRUCT, (uint64_t)hook);
+}
+static inline int32_t
+ompi_datatype_create_vector_hook_register(ompi_datatype_create_vector_hook_fn_t hook)
+{
+    return ompi_datatype_register_hook(OMPI_DATATYPE_HOOK_VECTOR, (uint64_t)hook);
+}
+static inline int32_t
+ompi_datatype_create_vector_hook_deregister(ompi_datatype_create_vector_hook_fn_t hook)
+{
+    return ompi_datatype_deregister_hook(OMPI_DATATYPE_HOOK_VECTOR, (uint64_t)hook);
+}
+static inline int32_t
+ompi_datatype_destroy_hook_register(ompi_datatype_destroy_hook_fn_t hook)
+{
+    return ompi_datatype_register_hook(OMPI_DATATYPE_HOOK_DESTROY, (uint64_t)hook);
+}
+static inline int32_t ompi_datatype_destroy_hook_deregister(ompi_datatype_destroy_hook_fn_t hook)
+{
+    return ompi_datatype_deregister_hook(OMPI_DATATYPE_HOOK_DESTROY, (uint64_t)hook);
+}
+
+
 
 OMPI_DECLSPEC int32_t ompi_datatype_create_darray( int size, int rank, int ndims, int const* gsize_array,
                                                    int const* distrib_array, int const* darg_array,

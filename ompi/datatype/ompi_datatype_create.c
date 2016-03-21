@@ -26,66 +26,6 @@
 #include "ompi/datatype/ompi_datatype.h"
 #include "ompi/attribute/attribute.h"
 
-static opal_list_t _destroy_hooks;
-static int _destroy_hooks_initialized = 0;
-
-typedef struct destroy_hook_item_t {
-    opal_list_item_t super;
-    ompi_datatype_destroy_hook_fn_t hook;
-} destroy_hook_item_t;
-
-OBJ_CLASS_DECLARATION(destroy_hook_item_t);
-OBJ_CLASS_INSTANCE(destroy_hook_item_t, opal_list_item_t, NULL, NULL);
-
-int32_t ompi_datatype_destroy_hook_register(ompi_datatype_destroy_hook_fn_t hook)
-{
-    destroy_hook_item_t *hook_item;
-    if (!_destroy_hooks_initialized) {
-        OBJ_CONSTRUCT(&_destroy_hooks, opal_list_t);
-        _destroy_hooks_initialized = 1;
-    }
-    hook_item = OBJ_NEW(destroy_hook_item_t);
-    hook_item->hook = hook;
-    opal_list_append(&_destroy_hooks,
-                     (opal_list_item_t *)hook_item);
-    return OMPI_SUCCESS;
-}
-
-int32_t ompi_datatype_destroy_hook_deregister(ompi_datatype_destroy_hook_fn_t hook)
-{
-    opal_list_item_t *item, *to_dereg = NULL;
-    for (item = opal_list_get_first(&_destroy_hooks);
-         item && (item != opal_list_get_end(&_destroy_hooks));
-         item = opal_list_get_next(item)) {
-        if (((destroy_hook_item_t *)item)->hook == hook) {
-            to_dereg = item;
-            break;
-        }
-    }
-    if (to_dereg) {
-        opal_list_remove_item(&_destroy_hooks, to_dereg);
-        OBJ_RELEASE(to_dereg);
-    }
-
-    if (opal_list_is_empty(&_destroy_hooks)) {
-        OBJ_DESTRUCT(&_destroy_hooks);
-        _destroy_hooks_initialized = 0;
-    }
-    return OMPI_SUCCESS;
-}
-
-static inline int32_t ompi_datatype_destroy_call_hooks( ompi_datatype_t* type )
-{
-    opal_list_item_t *item;
-    for (item = opal_list_get_first(&_destroy_hooks);
-         item && (item != opal_list_get_end(&_destroy_hooks));
-         item = opal_list_get_next(item)) {
-        ((destroy_hook_item_t *)item)->hook(type);
-    }
-
-    return OMPI_SUCCESS;
-}
-
 static void __ompi_datatype_allocate( ompi_datatype_t* datatype )
 {
     datatype->args               = NULL;
@@ -141,8 +81,10 @@ int32_t ompi_datatype_destroy( ompi_datatype_t** type)
     if( ompi_datatype_is_predefined(pData) && (pData->super.super.obj_reference_count <= 1) )
         return OMPI_ERROR;
 
-    ompi_datatype_destroy_call_hooks(pData);
 
+    OMPI_DATATYPE_CALL_HOOKS(OMPI_DATATYPE_HOOK_DESTROY,
+                             ompi_datatype_destroy_hook_fn_t,
+                             pData);
     OBJ_RELEASE(pData);
     *type = NULL;
     return OMPI_SUCCESS;
