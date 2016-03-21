@@ -748,3 +748,9 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
 
     return OMPI_SUCCESS;
 }
+
+int32_t hcoll_dtype_destroy_hook( ompi_datatype_t* dtype )
+{
+    fprintf(stderr,"Callig destroy hook\n");
+    return OMPI_SUCCESS;
+}
