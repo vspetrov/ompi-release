@@ -101,11 +101,9 @@ static hcoll_dte_op_t* ompi_op_2_hcolrte_op(ompi_op_t *op) {
     return ompi_op_2_hcoll_op[op->o_f_to_c_index];
 }
 
+int32_t hcoll_dtype_create_vector_hook( int count, int bLength, int stride,
+                                        const ompi_datatype_t* oldType, ompi_datatype_t* newType );
+int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const OPAL_PTRDIFF_TYPE* pDisp,
+                                       ompi_datatype_t* const* pTypes, ompi_datatype_t* newType );
 
-static int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const OPAL_PTRDIFF_TYPE* pDisp,
-                                      ompi_datatype_t* const* pTypes, ompi_datatype_t* newType )
-{
-    printf("Calling hook\n");
-    return OMPI_SUCCESS;
-}
 #endif /* COLL_HCOLL_DTYPES_H */

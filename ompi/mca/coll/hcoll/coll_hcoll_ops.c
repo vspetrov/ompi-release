@@ -705,3 +705,46 @@ int mca_coll_hcoll_igatherv(const void* sbuf, int scount,
 
 }
 
+
+int32_t hcoll_dtype_create_vector_hook( int count, int bLength, int stride,
+                                        const ompi_datatype_t* oldType, ompi_datatype_t* newType )
+{
+    dte_data_representation_t ptype;
+    ptype = ompi_dtype_2_dte_dtype(oldType);
+    if (HCOL_DTE_IS_ZERO(ptype) || HCOL_DTE_IS_COMPLEX(ptype)){
+        return OMPI_SUCCESS;
+    }
+
+    return OMPI_SUCCESS;
+}
+
+int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const OPAL_PTRDIFF_TYPE* pDisp,
+                                       ompi_datatype_t* const* pTypes, ompi_datatype_t* newType )
+{
+    int i;
+    dte_data_representation_t ptype;
+    int is_const_length = 1;
+    int is_const_stride = 1;
+    int is_const_type   = 1;
+    int stride = pDisp[1] - pDisp[0];
+    fprintf(stderr,"Calling struct hook\n");
+    for (i=0; i<count; i++) {
+        ptype = ompi_dtype_2_dte_dtype(pTypes[i]);
+        if (HCOL_DTE_IS_ZERO(ptype) || HCOL_DTE_IS_COMPLEX(ptype)){
+            /* we found not a simple dtype as an input for the new struct
+               dtype, we will not support this for now */
+            return OMPI_SUCCESS;
+        }
+        if (pBlockLength[i] != pBlockLength[0])
+            is_const_length = 0;
+        if (pTypes[i] != pTypes[0])
+            is_const_type = 0;
+        if (i > 1 && (pDisp[i]-pDisp[i-1] != stride))
+            is_const_stride = 0;
+    }
+    if (is_const_length && is_const_stride && is_const_type)
+        return hcoll_dtype_create_vector_hook(count,pBlockLength[0],stride,&pTypes[0],newType);
+
+
+    return OMPI_SUCCESS;
+}

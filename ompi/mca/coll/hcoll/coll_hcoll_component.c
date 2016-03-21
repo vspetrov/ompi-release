@@ -14,7 +14,7 @@
 
 #include "coll_hcoll.h"
 #include "opal/mca/installdirs/installdirs.h"
-
+#include "coll_hcoll_dtypes.h"
 /*
  * Public string showing the coll ompi_hcol component version number
  */
@@ -247,6 +247,12 @@ static int hcoll_close(void)
     if (false == cm->libhcoll_initialized) {
         return OMPI_SUCCESS;
     }
+
+
+
+    ompi_datatype_create_struct_hook_deregister(hcoll_dtype_create_struct_hook);
+    ompi_datatype_create_vector_hook_deregister(hcoll_dtype_create_vector_hook);
+
 
     if (cm->using_mem_hooks) {
         opal_mem_hooks_unregister_release(mca_coll_hcoll_mem_release_cb);
