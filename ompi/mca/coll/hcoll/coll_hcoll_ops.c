@@ -709,12 +709,14 @@ int mca_coll_hcoll_igatherv(const void* sbuf, int scount,
 int32_t hcoll_dtype_create_vector_hook( int count, int bLength, int stride,
                                         const ompi_datatype_t* oldType, ompi_datatype_t* newType )
 {
-    dte_data_representation_t ptype;
-    ptype = ompi_dtype_2_dte_dtype(oldType);
-    if (HCOL_DTE_IS_ZERO(ptype) || HCOL_DTE_IS_COMPLEX(ptype)){
+    dte_data_representation_t parent_dte, *new_dte;
+    parent_dte = ompi_dtype_2_dte_dtype(oldType);
+    if (HCOL_DTE_IS_ZERO(parent_dte) || HCOL_DTE_IS_COMPLEX(parent_dte)){
         return OMPI_SUCCESS;
     }
-
+    hcoll_dte_create_vector(count, bLength, stride, parent_dte, &new_dte);
+    opal_hash_table_set_value_uint32(&mca_coll_hcoll_component.derived_types_map,
+                                     newType->id,(void*)new_dte);
     return OMPI_SUCCESS;
 }
 
@@ -722,7 +724,7 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
                                        ompi_datatype_t* const* pTypes, ompi_datatype_t* newType )
 {
     int i;
-    dte_data_representation_t ptype;
+    dte_data_representation_t ptype, *new_dte;
     int is_const_length = 1;
     int is_const_stride = 1;
     int is_const_type   = 1;
@@ -744,8 +746,14 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
     }
     if (is_const_length && is_const_stride && is_const_type)
         return hcoll_dtype_create_vector_hook(count,pBlockLength[0],stride,&pTypes[0],newType);
+    fprintf(stderr,"Calling %s:%d\n",__FUNCTION__,__LINE__);
 
+    hcoll_dte_create_struct(count, pBlockLength, (int*)pDisp, pTypes, &new_dte);
+    fprintf(stderr,"Calling %s:%d\n",__FUNCTION__,__LINE__);
+    opal_hash_table_set_value_uint32(&mca_coll_hcoll_component.derived_types_map,
+                                     newType->id,(void*)new_dte);
 
+    fprintf(stderr,"Calling struct hook, created new dte %p for ompi type %d\n", new_dte, newType->id);
     return OMPI_SUCCESS;
 }
 
