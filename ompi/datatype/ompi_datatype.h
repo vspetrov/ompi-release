@@ -196,10 +196,14 @@ typedef int32_t (*ompi_datatype_create_struct_hook_fn_t)( int count, const int* 
                                                           ompi_datatype_t* const* pTypes, ompi_datatype_t* newType );
 typedef int32_t (*ompi_datatype_create_vector_hook_fn_t)( int count, int bLength, int stride,
                                                           const ompi_datatype_t* oldType, ompi_datatype_t* newType );
+typedef int32_t (*ompi_datatype_destroy_hook_fn_t)( ompi_datatype_t* type );
+
 OMPI_DECLSPEC int32_t ompi_datatype_create_struct_hook_register(ompi_datatype_create_struct_hook_fn_t hook);
 OMPI_DECLSPEC int32_t ompi_datatype_create_struct_hook_deregister(ompi_datatype_create_struct_hook_fn_t hook);
 OMPI_DECLSPEC int32_t ompi_datatype_create_vector_hook_register(ompi_datatype_create_vector_hook_fn_t hook);
 OMPI_DECLSPEC int32_t ompi_datatype_create_vector_hook_deregister(ompi_datatype_create_vector_hook_fn_t hook);
+OMPI_DECLSPEC int32_t ompi_datatype_destroy_hook_register  (ompi_datatype_destroy_hook_fn_t hook);
+OMPI_DECLSPEC int32_t ompi_datatype_destroy_hook_deregister(ompi_datatype_destroy_hook_fn_t hook);
 
 OMPI_DECLSPEC int32_t ompi_datatype_create_darray( int size, int rank, int ndims, int const* gsize_array,
                                                    int const* distrib_array, int const* darg_array,
