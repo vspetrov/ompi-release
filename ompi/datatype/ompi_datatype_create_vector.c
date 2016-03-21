@@ -23,7 +23,7 @@
 #include "ompi_config.h"
 
 #include <stddef.h>
-
+#include "opal/class/opal_list.h"
 #include "ompi/datatype/ompi_datatype.h"
 
 /* Open questions ...
@@ -31,24 +31,65 @@
  *    can be ONLY a initial solution.
  *
  */
-static ompi_datatype_create_vector_hook_fn_t create_vector_hook = NULL;
+
+static opal_list_t _create_vector_hooks;
+static int _vector_hooks_initialized = 0;
+
+typedef struct create_vector_hook_item_t {
+    opal_list_item_t super;
+    ompi_datatype_create_vector_hook_fn_t hook;
+} create_vector_hook_item_t;
+
+OBJ_CLASS_DECLARATION(create_vector_hook_item_t);
+OBJ_CLASS_INSTANCE(create_vector_hook_item_t, opal_list_item_t, NULL, NULL);
+
 int32_t ompi_datatype_create_vector_hook_register(ompi_datatype_create_vector_hook_fn_t hook)
 {
-    create_vector_hook = hook;
+    create_vector_hook_item_t *hook_item;
+    if (!_vector_hooks_initialized) {
+        OBJ_CONSTRUCT(&_create_vector_hooks, opal_list_t);
+        _vector_hooks_initialized = 1;
+    }
+    hook_item = OBJ_NEW(create_vector_hook_item_t);
+    hook_item->hook = hook;
+    opal_list_append(&_create_vector_hooks,
+                     (opal_list_item_t *)hook_item);
     return OMPI_SUCCESS;
 }
 
 int32_t ompi_datatype_create_vector_hook_deregister(ompi_datatype_create_vector_hook_fn_t hook)
 {
-    create_vector_hook = NULL;
+    opal_list_item_t *item, *to_dereg = NULL;
+    for (item = opal_list_get_first(&_create_vector_hooks);
+         item && (item != opal_list_get_end(&_create_vector_hooks));
+         item = opal_list_get_next(item)) {
+        if (((create_vector_hook_item_t *)item)->hook == hook) {
+            to_dereg = item;
+            break;
+        }
+    }
+    if (to_dereg) {
+        opal_list_remove_item(&_create_vector_hooks, to_dereg);
+        OBJ_RELEASE(to_dereg);
+    }
+
+    if (opal_list_is_empty(&_create_vector_hooks)) {
+        OBJ_DESTRUCT(&_create_vector_hooks);
+        _vector_hooks_initialized = 0;
+    }
     return OMPI_SUCCESS;
 }
 
 static inline int32_t ompi_datatype_create_vector_call_hooks( int count, int bLength, int stride,
                                                               const ompi_datatype_t* oldType, ompi_datatype_t* newType )
 {
-    if (create_vector_hook)
-        create_vector_hook(count, bLength, stride, oldType, newType);
+    opal_list_item_t *item;
+    for (item = opal_list_get_first(&_create_vector_hooks);
+         item && (item != opal_list_get_end(&_create_vector_hooks));
+         item = opal_list_get_next(item)) {
+        ((create_vector_hook_item_t *)item)->hook(count, bLength, stride, oldType, newType);
+    }
+
     return OMPI_SUCCESS;
 }
 
