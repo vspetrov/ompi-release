@@ -746,12 +746,20 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
     }
     if (is_const_length && is_const_stride && is_const_type)
         return hcoll_dtype_create_vector_hook(count,pBlockLength[0],stride,&pTypes[0],newType);
+
+    dte_data_representation_t *dte_types = (dte_data_representation_t *)
+        malloc(count*sizeof(*dte_types));
+    for (i=0; i<count; i++)
+        dte_types[i] = ompi_dtype_2_dte_dtype(pTypes[i]);
+
     fprintf(stderr,"Calling %s:%d\n",__FUNCTION__,__LINE__);
 
-    hcoll_dte_create_struct(count, pBlockLength, (int*)pDisp, pTypes, &new_dte);
+    hcoll_dte_create_struct(count, (int*)pBlockLength, (int*)pDisp, dte_types, &new_dte);
     fprintf(stderr,"Calling %s:%d\n",__FUNCTION__,__LINE__);
     opal_hash_table_set_value_uint32(&mca_coll_hcoll_component.derived_types_map,
                                      newType->id,(void*)new_dte);
+
+    free(dte_types);
 
     fprintf(stderr,"Calling struct hook, created new dte %p for ompi type %d\n", new_dte, newType->id);
     return OMPI_SUCCESS;
