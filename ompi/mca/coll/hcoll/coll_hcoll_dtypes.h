@@ -59,27 +59,32 @@ static dte_data_representation_t* ompi_datatype_2_dte_data_rep[OPAL_DATATYPE_MAX
     &DTE_ZERO                   /*OPAL_DATATYPE_UNAVAILABLE    24 */
 };
 
-static dte_data_representation_t find_derived_mapping(ompi_datatype_t *dtype){
+static dte_data_representation_t* find_derived_mapping(ompi_datatype_t *dtype){
     dte_data_representation_t *dte;
     int ret = opal_hash_table_get_value_uint32(&mca_coll_hcoll_component.derived_types_map,
-                                               dtype->id, &dte);
+                                               dtype->id, (void**)&dte);
     if (OPAL_SUCCESS == ret) {
         fprintf(stderr,"Found derived mapping: type %p for ompi id %d\n", dte, dtype->id);
 
-        return *dte;
+        return dte;
     }
-    return DTE_ZERO;
+    return NULL;
 }
 static dte_data_representation_t ompi_dtype_2_dte_dtype(ompi_datatype_t *dtype){
     int ompi_type_id = dtype->id;
     int opal_type_id = dtype->super.id;
-    dte_data_representation_t dte_data_rep;
+    dte_data_representation_t *dte_data_rep = NULL;
     if (!(dtype->super.flags & OPAL_DATATYPE_FLAG_NO_GAPS)) {
         ompi_type_id = -1;
     }
     if (OPAL_UNLIKELY( ompi_type_id < 0 ||
                        ompi_type_id >= OPAL_DATATYPE_MAX_PREDEFINED)){
-        return find_derived_mapping(dtype);
+        dte_data_rep = find_derived_mapping(dtype);
+        if (dte_data_rep) {
+            return *dte_data_rep;
+        } else {
+            return DTE_ZERO;
+        }
     }
     return *ompi_datatype_2_dte_data_rep[opal_type_id];
 }

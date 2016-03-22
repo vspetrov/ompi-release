@@ -767,6 +767,11 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
 
 int32_t hcoll_dtype_destroy_hook( ompi_datatype_t* dtype )
 {
+    int ret = OMPI_SUCCESS;
     fprintf(stderr,"Callig destroy hook\n");
-    return OMPI_SUCCESS;
+    dte_data_representation_t *dte =
+        find_derived_mapping(dtype);
+    if (!HCOL_DTE_IS_ZERO((*dte)))
+        ret = hcoll_dte_destroy(dte);
+    return ret;
 }
