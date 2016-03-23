@@ -205,7 +205,11 @@ static int hcoll_register(void)
                   1, 
                   &mca_coll_hcoll_component.hcoll_datatype_fallback,
                   0));
-
+    CHECK(reg_int("dts",NULL,
+                  "[1|0|] Enable/Disable derived types support",
+                  0,
+                  &mca_coll_hcoll_component.derived_types_support_enabled,
+                  0));
 
     return ret;
 }
@@ -249,10 +253,14 @@ static int hcoll_close(void)
     }
 
 
-
-    ompi_datatype_create_struct_hook_deregister(hcoll_dtype_create_struct_hook);
-    ompi_datatype_create_vector_hook_deregister(hcoll_dtype_create_vector_hook);
-    ompi_datatype_destroy_hook_deregister(hcoll_dtype_destroy_hook);
+    if (mca_coll_hcoll_component.derived_types_support_enabled) {
+        ompi_datatype_create_struct_hook_deregister(hcoll_dtype_create_struct_hook);
+        ompi_datatype_create_vector_hook_deregister(hcoll_dtype_create_vector_hook);
+        ompi_datatype_destroy_hook_deregister(hcoll_dtype_destroy_hook);
+        /*TODO iterate through the hash table and destroy dte type in case
+          user forgot to call MPI_Type_free */
+        OBJ_DESTRUCT(&mca_coll_hcoll_component.derived_types_map);
+    }
 
 
     if (cm->using_mem_hooks) {

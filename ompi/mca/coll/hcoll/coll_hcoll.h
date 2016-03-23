@@ -83,6 +83,7 @@ struct mca_coll_hcoll_component_t {
 
     ompi_free_list_t requests;
     opal_hash_table_t derived_types_map;
+    int derived_types_support_enabled;
 };
 typedef struct mca_coll_hcoll_component_t mca_coll_hcoll_component_t;
 

@@ -44,7 +44,7 @@ int mca_coll_hcoll_bcast(void *buff, int count,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL BCAST");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    dtype = ompi_dtype_2_dte_dtype(datatype);
+    dtype = ompi_dtype_2_dte_dtype(datatype, TRY_FIND_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(dtype) || HCOL_DTE_IS_COMPLEX(dtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
         /*If we are here then datatype is not simple predefined datatype */
@@ -76,8 +76,8 @@ int mca_coll_hcoll_allgather(void *sbuf, int scount,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL ALLGATHER");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -117,8 +117,8 @@ int mca_coll_hcoll_allgatherv(const void *sbuf, int scount,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL ALLGATHERV");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -161,8 +161,8 @@ int mca_coll_hcoll_gather(const void *sbuf, int scount,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL GATHER");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -201,7 +201,7 @@ int mca_coll_hcoll_allreduce(void *sbuf, void *rbuf, int count,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL ALLREDUCE");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    Dtype = ompi_dtype_2_dte_dtype(dtype);
+    Dtype = ompi_dtype_2_dte_dtype(dtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(Dtype) || HCOL_DTE_IS_COMPLEX(Dtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
         /*If we are here then datatype is not simple predefined datatype */
@@ -250,7 +250,7 @@ int mca_coll_hcoll_reduce(const void *sbuf, void *rbuf, int count,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL REDUCE");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    Dtype = ompi_dtype_2_dte_dtype(dtype);
+    Dtype = ompi_dtype_2_dte_dtype(dtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(Dtype) || HCOL_DTE_IS_COMPLEX(Dtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
         /*If we are here then datatype is not simple predefined datatype */
@@ -302,8 +302,8 @@ int mca_coll_hcoll_alltoall(const void *sbuf, int scount,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL ALLTOALL");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -342,8 +342,8 @@ int mca_coll_hcoll_alltoallv(void *sbuf, int *scounts, int *sdisps,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL ALLTOALLV");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -380,8 +380,8 @@ int mca_coll_hcoll_gatherv(void* sbuf, int scount,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL GATHERV");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -436,7 +436,7 @@ int mca_coll_hcoll_ibcast(void *buff, int count,
     HCOL_VERBOSE(20,"RUNNING HCOL NON-BLOCKING BCAST");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
     rt_handle = (void**) request;
-    dtype = ompi_dtype_2_dte_dtype(datatype);
+    dtype = ompi_dtype_2_dte_dtype(datatype, TRY_FIND_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(dtype) || HCOL_DTE_IS_COMPLEX(dtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
         /*If we are here then datatype is not simple predefined datatype */
@@ -471,8 +471,8 @@ int mca_coll_hcoll_iallgather(void *sbuf, int scount,
     HCOL_VERBOSE(20,"RUNNING HCOL NON-BLOCKING ALLGATHER");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
     rt_handle = (void**) request;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -516,8 +516,8 @@ int mca_coll_hcoll_iallgatherv(const void *sbuf, int scount,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL NON-BLOCKING ALLGATHERV");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     void **rt_handle = (void **) request;
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
@@ -566,7 +566,7 @@ int mca_coll_hcoll_iallreduce(const void *sbuf, void *rbuf, int count,
     HCOL_VERBOSE(20,"RUNNING HCOL NON-BLOCKING ALLREDUCE");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
     rt_handle = (void**) request;
-    Dtype = ompi_dtype_2_dte_dtype(dtype);
+    Dtype = ompi_dtype_2_dte_dtype(dtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(Dtype) || HCOL_DTE_IS_COMPLEX(Dtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
         /*If we are here then datatype is not simple predefined datatype */
@@ -616,7 +616,7 @@ int mca_coll_hcoll_ireduce(const void *sbuf, void *rbuf, int count,
     int rc;
     HCOL_VERBOSE(20,"RUNNING HCOL NON-BLOCKING REDUCE");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
-    Dtype = ompi_dtype_2_dte_dtype(dtype);
+    Dtype = ompi_dtype_2_dte_dtype(dtype, NO_DERIVED);
     void **rt_handle = (void**) request;
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(Dtype) || HCOL_DTE_IS_COMPLEX(Dtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -676,8 +676,8 @@ int mca_coll_hcoll_igatherv(const void* sbuf, int scount,
     HCOL_VERBOSE(20,"RUNNING HCOL IGATHERV");
     mca_coll_hcoll_module_t *hcoll_module = (mca_coll_hcoll_module_t*)module;
     rt_handle = (void**) request;
-    stype = ompi_dtype_2_dte_dtype(sdtype);
-    rtype = ompi_dtype_2_dte_dtype(rdtype);
+    stype = ompi_dtype_2_dte_dtype(sdtype, NO_DERIVED);
+    rtype = ompi_dtype_2_dte_dtype(rdtype, NO_DERIVED);
     if (OPAL_UNLIKELY((HCOL_DTE_IS_ZERO(stype) || HCOL_DTE_IS_ZERO(rtype)
                         || HCOL_DTE_IS_COMPLEX(stype) || HCOL_DTE_IS_COMPLEX(rtype)))
                         && mca_coll_hcoll_component.hcoll_datatype_fallback){
@@ -710,7 +710,7 @@ int32_t hcoll_dtype_create_vector_hook( int count, int bLength, int stride,
                                         const ompi_datatype_t* oldType, ompi_datatype_t* newType )
 {
     dte_data_representation_t parent_dte, *new_dte;
-    parent_dte = ompi_dtype_2_dte_dtype(oldType);
+    parent_dte = ompi_dtype_2_dte_dtype(oldType, TRY_FIND_DERIVED);
     if (HCOL_DTE_IS_ZERO(parent_dte) || HCOL_DTE_IS_COMPLEX(parent_dte)){
         return OMPI_SUCCESS;
     }
@@ -731,7 +731,7 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
     int stride = pDisp[1] - pDisp[0];
     fprintf(stderr,"Calling struct hook\n");
     for (i=0; i<count; i++) {
-        ptype = ompi_dtype_2_dte_dtype(pTypes[i]);
+        ptype = ompi_dtype_2_dte_dtype(pTypes[i], TRY_FIND_DERIVED);
         if (HCOL_DTE_IS_ZERO(ptype) || HCOL_DTE_IS_COMPLEX(ptype)){
             /* we found not a simple dtype as an input for the new struct
                dtype, we will not support this for now */
@@ -750,7 +750,7 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
     dte_data_representation_t *dte_types = (dte_data_representation_t *)
         malloc(count*sizeof(*dte_types));
     for (i=0; i<count; i++)
-        dte_types[i] = ompi_dtype_2_dte_dtype(pTypes[i]);
+        dte_types[i] = ompi_dtype_2_dte_dtype(pTypes[i], TRY_FIND_DERIVED);
 
     fprintf(stderr,"Calling %s:%d\n",__FUNCTION__,__LINE__);
 

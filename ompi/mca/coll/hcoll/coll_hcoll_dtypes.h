@@ -70,7 +70,14 @@ static dte_data_representation_t* find_derived_mapping(ompi_datatype_t *dtype){
     }
     return NULL;
 }
-static dte_data_representation_t ompi_dtype_2_dte_dtype(ompi_datatype_t *dtype){
+
+enum {
+    TRY_FIND_DERIVED,
+    NO_DERIVED
+};
+static dte_data_representation_t ompi_dtype_2_dte_dtype(ompi_datatype_t *dtype,
+                                                        const int mode)
+{
     int ompi_type_id = dtype->id;
     int opal_type_id = dtype->super.id;
     dte_data_representation_t *dte_data_rep = NULL;
@@ -79,7 +86,9 @@ static dte_data_representation_t ompi_dtype_2_dte_dtype(ompi_datatype_t *dtype){
     }
     if (OPAL_UNLIKELY( ompi_type_id < 0 ||
                        ompi_type_id >= OPAL_DATATYPE_MAX_PREDEFINED)){
-        dte_data_rep = find_derived_mapping(dtype);
+
+        if (TRY_FIND_DERIVED == mode) dte_data_rep = find_derived_mapping(dtype);
+
         if (dte_data_rep) {
             return *dte_data_rep;
         } else {
