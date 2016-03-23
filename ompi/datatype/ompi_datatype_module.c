@@ -469,6 +469,12 @@ int32_t ompi_datatype_init( void )
      * in mpif.h
      */
 
+    /* Initialize hooks lists */
+    for ( i = 0; i < OMPI_DATATYPE_HOOK_NUM; i++ ) {
+        OBJ_CONSTRUCT(&ompi_datatype_hooks.hooks[i],
+                      opal_list_t);
+    }
+
 
     /* Now the predefined MPI2 datatypes (they should last forever!) */
     DECLARE_MPI2_COMPOSED_BLOCK_DDT( &ompi_mpi_2int.dt, OMPI_DATATYPE_2INT, "MPI_2INT",
@@ -638,10 +644,6 @@ int32_t ompi_datatype_init( void )
         }
     }
     ompi_datatype_default_convertors_init();
-    for ( i = 0; i < OMPI_DATATYPE_HOOK_NUM; i++ ) {
-        OBJ_CONSTRUCT(&ompi_datatype_hooks.hooks[i],
-                      opal_list_t);
-    }
     return OMPI_SUCCESS;
 }
 
