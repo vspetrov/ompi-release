@@ -729,7 +729,6 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
     int is_const_stride = 1;
     int is_const_type   = 1;
     OPAL_PTRDIFF_TYPE stride = pDisp[1] - pDisp[0];
-    fprintf(stderr,"Calling struct hook\n");
     for (i=0; i<count; i++) {
         ptype = ompi_dtype_2_dte_dtype(pTypes[i], TRY_FIND_DERIVED);
         if (HCOL_DTE_IS_ZERO(ptype) || HCOL_DTE_IS_COMPLEX(ptype)){
@@ -752,23 +751,17 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
     for (i=0; i<count; i++)
         dte_types[i] = ompi_dtype_2_dte_dtype(pTypes[i], TRY_FIND_DERIVED);
 
-    fprintf(stderr,"Calling %s:%d\n",__FUNCTION__,__LINE__);
-
     hcoll_dte_create_struct(count, (int*)pBlockLength, (ptrdiff_t*)pDisp, dte_types, &new_dte);
-    fprintf(stderr,"Calling %s:%d\n",__FUNCTION__,__LINE__);
     opal_hash_table_set_value_uint32(&mca_coll_hcoll_component.derived_types_map,
                                      newType->id,(void*)new_dte);
 
     free(dte_types);
-
-    fprintf(stderr,"Calling struct hook, created new dte %p for ompi type %d\n", new_dte, newType->id);
     return OMPI_SUCCESS;
 }
 
 int32_t hcoll_dtype_destroy_hook( ompi_datatype_t* dtype )
 {
     int ret = OMPI_SUCCESS;
-    fprintf(stderr,"Callig destroy hook\n");
     dte_data_representation_t *dte =
         find_derived_mapping(dtype);
     if (!HCOL_DTE_IS_ZERO((*dte)))

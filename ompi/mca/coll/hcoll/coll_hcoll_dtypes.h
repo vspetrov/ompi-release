@@ -64,8 +64,6 @@ static dte_data_representation_t* find_derived_mapping(ompi_datatype_t *dtype){
     int ret = opal_hash_table_get_value_uint32(&mca_coll_hcoll_component.derived_types_map,
                                                dtype->id, (void**)&dte);
     if (OPAL_SUCCESS == ret) {
-        fprintf(stderr,"Found derived mapping: type %p for ompi id %d\n", dte, dtype->id);
-
         return dte;
     }
     return NULL;
