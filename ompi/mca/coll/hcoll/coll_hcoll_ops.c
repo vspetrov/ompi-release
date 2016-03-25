@@ -764,7 +764,11 @@ int32_t hcoll_dtype_destroy_hook( ompi_datatype_t* dtype )
     int ret = OMPI_SUCCESS;
     dte_data_representation_t *dte =
         find_derived_mapping(dtype);
-    if (!HCOL_DTE_IS_ZERO((*dte)))
+    if (dte) {
         ret = hcoll_dte_destroy(dte);
+        opal_hash_table_remove_value_uint32(&mca_coll_hcoll_component.derived_types_map,
+                                            dtype->id);
+    }
+
     return ret;
 }
