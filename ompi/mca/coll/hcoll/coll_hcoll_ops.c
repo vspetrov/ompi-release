@@ -743,8 +743,8 @@ int32_t hcoll_dtype_create_struct_hook(int count, const int* pBlockLength, const
         if (i > 1 && (pDisp[i]-pDisp[i-1] != stride))
             is_const_stride = 0;
     }
-    if (is_const_length && is_const_stride && is_const_type)
-        return hcoll_dtype_create_vector_hook(count,pBlockLength[0],(int)stride,&pTypes[0],newType);
+    if (is_const_length && is_const_stride && is_const_type && stride < INT_MAX)
+        return hcoll_dtype_create_vector_hook(count,pBlockLength[0],(int)stride,pTypes[0],newType);
 
     dte_data_representation_t *dte_types = (dte_data_representation_t *)
         malloc(count*sizeof(*dte_types));
