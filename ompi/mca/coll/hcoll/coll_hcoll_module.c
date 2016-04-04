@@ -10,6 +10,7 @@
 #include "ompi_config.h"
 #include "coll_hcoll.h"
 #include "coll_hcoll_dtypes.h"
+#include "ompi/mca/mpool/mpool.h"
 
 int hcoll_comm_attr_keyval;
 
@@ -361,6 +362,7 @@ mca_coll_hcoll_comm_query(struct ompi_communicator_t *comm, int *priority)
             ompi_datatype_create_struct_hook_register(hcoll_dtype_create_struct_hook);
             ompi_datatype_create_vector_hook_register(hcoll_dtype_create_vector_hook);
             ompi_datatype_destroy_hook_register(hcoll_dtype_destroy_hook);
+            alloc_mem_hook_fn = hcoll_alloc_mem_hook;
         }
     }
 

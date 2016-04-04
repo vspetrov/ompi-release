@@ -299,6 +299,8 @@ int mca_coll_hcoll_igatherv(const void* sbuf, int scount,
 
 int mca_coll_hcoll_progress(void);
 void mca_coll_hcoll_mem_release_cb(void *buf, size_t length, void *cbdata, bool from_alloc);
+
+int hcoll_alloc_mem_hook(void *addr, size_t len);
 END_C_DECLS
 
 #endif

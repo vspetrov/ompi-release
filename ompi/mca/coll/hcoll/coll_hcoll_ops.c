@@ -772,3 +772,9 @@ int32_t hcoll_dtype_destroy_hook( ompi_datatype_t* dtype )
 
     return ret;
 }
+
+
+int hcoll_alloc_mem_hook(void *addr, size_t len) {
+    hcoll_register_mem(addr, len);
+    return OMPI_SUCCESS;
+}

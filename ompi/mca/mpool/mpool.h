@@ -258,6 +258,9 @@ OMPI_DECLSPEC int mca_mpool_base_insert(
 
 OMPI_DECLSPEC int mca_mpool_base_remove(void * base); 
 
+typedef int (*alloc_mem_hook_fn_t)(void *addr, size_t len);
+
+extern alloc_mem_hook_fn_t alloc_mem_hook_fn;
 /**
  * Macro for use in components that are of type mpool
  */
