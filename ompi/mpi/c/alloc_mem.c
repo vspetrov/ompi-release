@@ -68,7 +68,6 @@ int MPI_Alloc_mem(MPI_Aint size, MPI_Info info, void *baseptr)
     }
 
     OPAL_CR_ENTER_LIBRARY();
-    fprintf(stderr,"[%d][%s] -- [%d]\n",getpid(),__FUNCTION__,__LINE__);
     *((void **) baseptr) = mca_mpool_base_alloc((size_t) size, info);
     OPAL_CR_EXIT_LIBRARY();
     if (NULL == *((void **) baseptr)) {
