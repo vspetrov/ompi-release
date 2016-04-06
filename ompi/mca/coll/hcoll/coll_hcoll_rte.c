@@ -92,7 +92,6 @@ static void* get_coll_handle(void);
 static int coll_handle_test(void* handle);
 static void coll_handle_free(void *handle);
 static void coll_handle_complete(void *handle);
-static int group_id(rte_grp_handle_t group);
 
 static int world_rank(rte_grp_handle_t grp_h, rte_ec_handle_t ec);
 /* Module Constructors */
@@ -113,7 +112,6 @@ static void init_module_fns(void){
     hcoll_rte_functions.rte_coll_handle_test_fn = coll_handle_test;
     hcoll_rte_functions.rte_coll_handle_free_fn = coll_handle_free;
     hcoll_rte_functions.rte_coll_handle_complete_fn = coll_handle_complete;
-    hcoll_rte_functions.rte_group_id_fn = group_id;
     hcoll_rte_functions.rte_world_rank_fn = world_rank;
 }
 
@@ -369,9 +367,6 @@ static uint32_t jobid(void){
     return ORTE_PROC_MY_NAME->jobid;
 }
 
-static int group_id(rte_grp_handle_t group){
-    return ((ompi_communicator_t *)group)->c_contextid;
-}
 
 static int 
 request_free(struct ompi_request_t **ompi_req)
