@@ -301,6 +301,7 @@ int mca_coll_hcoll_progress(void);
 void mca_coll_hcoll_mem_release_cb(void *buf, size_t length, void *cbdata, bool from_alloc);
 
 int hcoll_alloc_mem_hook(void *addr, size_t len);
+int hcoll_free_mem_hook(void *addr);
 END_C_DECLS
 
 #endif

@@ -778,3 +778,8 @@ int hcoll_alloc_mem_hook(void *addr, size_t len) {
     hcoll_register_mem(addr, len);
     return OMPI_SUCCESS;
 }
+
+int hcoll_free_mem_hook(void *addr) {
+    hcoll_deregister_mem(addr);
+    return OMPI_SUCCESS;
+}
