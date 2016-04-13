@@ -191,6 +191,7 @@ include mpi/man/man3/Makefile.extra
 include mpiext/Makefile.am
 include patterns/net/Makefile.am
 include patterns/comm/Makefile.am
+include hooks/Makefile.am
 
 # Ensure that the man page directory exists before we try to make man
 # page files (because ompi/mpi/man/man3 has no config.status-generated

@@ -30,6 +30,7 @@
 
 
 #include "coll_hcoll_debug.h"
+#include "ompi/hooks/ompi_hooks.h"
 #ifndef HCOLL_VERSION
 #define HCOLL_VERSION(major, minor) (((major)<<HCOLL_MAJOR_BIT)|((minor)<<HCOLL_MINOR_BIT))
 #endif

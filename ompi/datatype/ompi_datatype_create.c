@@ -25,6 +25,7 @@
 #include "opal/class/opal_pointer_array.h"
 #include "ompi/datatype/ompi_datatype.h"
 #include "ompi/attribute/attribute.h"
+#include "ompi/hooks/ompi_hooks.h"
 
 static void __ompi_datatype_allocate( ompi_datatype_t* datatype )
 {
@@ -82,9 +83,9 @@ int32_t ompi_datatype_destroy( ompi_datatype_t** type)
         return OMPI_ERROR;
 
 
-    OMPI_DATATYPE_CALL_HOOKS(OMPI_DATATYPE_HOOK_DESTROY,
-                             ompi_datatype_destroy_hook_fn_t,
-                             pData);
+    OMPI_CALL_HOOKS(OMPI_HOOK_DESTROY_TYPE,
+                    ompi_datatype_destroy_hook_fn_t,
+                    pData);
     OBJ_RELEASE(pData);
     *type = NULL;
     return OMPI_SUCCESS;

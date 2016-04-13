@@ -88,6 +88,7 @@
 #include "ompi/mca/dpm/base/base.h"
 #include "ompi/mca/pubsub/base/base.h"
 #include "ompi/mpiext/mpiext.h"
+#include "ompi/hooks/ompi_hooks.h"
 
 #if OPAL_ENABLE_FT_CR == 1
 #include "ompi/mca/crcp/crcp.h"
@@ -521,6 +522,12 @@ int ompi_mpi_init(int argc, char **argv, int requested, int *provided)
     /* add this bitflag to the modex */
     if ( OMPI_SUCCESS != (ret = ompi_modex_send_string("MPI_THREAD_LEVEL", &threadlevel_bf, sizeof(uint8_t)))) {
         error = "ompi_mpi_init: modex send thread level";
+        goto error;
+    }
+
+
+    if (OMPI_SUCCESS != (ret = ompi_hooks_init())) {
+        error = "ompi_hooks_init() failed";
         goto error;
     }
 

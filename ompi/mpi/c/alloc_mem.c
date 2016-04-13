@@ -28,6 +28,7 @@
 #include "ompi/errhandler/errhandler.h"
 #include "ompi/info/info.h"
 #include "ompi/mca/mpool/mpool.h"
+#include "ompi/hooks/ompi_hooks.h"
 
 #if OPAL_HAVE_WEAK_SYMBOLS && OMPI_PROFILING_DEFINES
 #pragma weak MPI_Alloc_mem = PMPI_Alloc_mem
@@ -38,8 +39,6 @@
 #endif
 
 static const char FUNC_NAME[] = "MPI_Alloc_mem";
-
-alloc_mem_hook_fn_t alloc_mem_hook_fn = NULL;
 
 int MPI_Alloc_mem(MPI_Aint size, MPI_Info info, void *baseptr)
 {
@@ -75,9 +74,9 @@ int MPI_Alloc_mem(MPI_Aint size, MPI_Info info, void *baseptr)
                                       FUNC_NAME);
     }
 
-    if (alloc_mem_hook_fn) {
-        alloc_mem_hook_fn(*((void **) baseptr), size);
-    }
+    OMPI_CALL_HOOKS(OMPI_HOOK_ALLOC_MEM,
+                    ompi_alloc_mem_hook_fn_t,
+                    *((void **) baseptr), size);
     /* All done */
     return MPI_SUCCESS;
 }

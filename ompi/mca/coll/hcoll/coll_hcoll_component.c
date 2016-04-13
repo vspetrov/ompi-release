@@ -266,6 +266,11 @@ static int hcoll_close(void)
         /*TODO iterate through the hash table and destroy dte type in case
           user forgot to call MPI_Type_free */
     }
+    if (mca_coll_hcoll_component.mpi_alloc_mem_hook_enabled) {
+        ompi_alloc_mem_hook_deregister(hcoll_alloc_mem_hook);
+        ompi_free_mem_hook_deregister(hcoll_free_mem_hook);
+    }
+
     if (cm->using_mem_hooks) {
         opal_mem_hooks_unregister_release(mca_coll_hcoll_mem_release_cb);
     }

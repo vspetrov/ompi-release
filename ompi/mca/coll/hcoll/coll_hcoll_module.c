@@ -364,8 +364,8 @@ mca_coll_hcoll_comm_query(struct ompi_communicator_t *comm, int *priority)
             ompi_datatype_destroy_hook_register(hcoll_dtype_destroy_hook);
         }
         if (mca_coll_hcoll_component.mpi_alloc_mem_hook_enabled) {
-            alloc_mem_hook_fn = hcoll_alloc_mem_hook;
-            free_mem_hook_fn =  hcoll_free_mem_hook;
+            ompi_alloc_mem_hook_register(hcoll_alloc_mem_hook);
+            ompi_free_mem_hook_register(hcoll_free_mem_hook);
         }
     }
 

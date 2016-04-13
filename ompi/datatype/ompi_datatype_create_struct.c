@@ -24,6 +24,7 @@
 
 #include <stddef.h>
 #include "ompi/datatype/ompi_datatype.h"
+#include "ompi/hooks/ompi_hooks.h"
 
 int32_t ompi_datatype_create_struct( int count, const int* pBlockLength, const OPAL_PTRDIFF_TYPE* pDisp,
                                      ompi_datatype_t* const * pTypes, ompi_datatype_t** newType )
@@ -89,9 +90,9 @@ int32_t ompi_datatype_create_struct( int count, const int* pBlockLength, const O
     }
     ompi_datatype_add( pdt, lastType, lastBlock, lastDisp, lastExtent );
 
-    OMPI_DATATYPE_CALL_HOOKS(OMPI_DATATYPE_HOOK_STRUCT,
-                             ompi_datatype_create_struct_hook_fn_t,
-                             count, pBlockLength, pDisp, pTypes, pdt);
+    OMPI_CALL_HOOKS(OMPI_HOOK_CREATE_TYPE_STRUCT,
+                    ompi_datatype_create_struct_hook_fn_t,
+                    count, pBlockLength, pDisp, pTypes, pdt);
      *newType = pdt;
     return OMPI_SUCCESS;
 }

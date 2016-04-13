@@ -24,6 +24,7 @@
 
 #include <stddef.h>
 #include "ompi/datatype/ompi_datatype.h"
+#include "ompi/hooks/ompi_hooks.h"
 
 /* Open questions ...
  *  - how to improuve the handling of these vectors (creating a temporary datatype
@@ -59,9 +60,9 @@ int32_t ompi_datatype_create_vector( int count, int bLength, int stride,
         }
     }
 
-    OMPI_DATATYPE_CALL_HOOKS(OMPI_DATATYPE_HOOK_VECTOR,
-                             ompi_datatype_create_vector_hook_fn_t,
-                             count, bLength, stride, oldType, pData);
+    OMPI_CALL_HOOKS(OMPI_HOOK_CREATE_TYPE_VECTOR,
+                    ompi_datatype_create_vector_hook_fn_t,
+                    count, bLength, stride, oldType, pData);
 
     *newType = pData;
     return OMPI_SUCCESS;
