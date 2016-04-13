@@ -210,6 +210,11 @@ static int hcoll_register(void)
                   0,
                   &mca_coll_hcoll_component.derived_types_support_enabled,
                   0));
+    CHECK(reg_int("amh",NULL,
+                  "[1|0|] Enable/Disable MPI_Alloc_mem hook for coll/hcoll component",
+                  0,
+                  &mca_coll_hcoll_component.mpi_alloc_mem_hook_enabled,
+                  0));
 
     return ret;
 }
@@ -254,15 +259,13 @@ static int hcoll_close(void)
 
 
     if (mca_coll_hcoll_component.derived_types_support_enabled) {
+        OBJ_DESTRUCT(&mca_coll_hcoll_component.derived_types_map);
         ompi_datatype_create_struct_hook_deregister(hcoll_dtype_create_struct_hook);
         ompi_datatype_create_vector_hook_deregister(hcoll_dtype_create_vector_hook);
         ompi_datatype_destroy_hook_deregister(hcoll_dtype_destroy_hook);
         /*TODO iterate through the hash table and destroy dte type in case
           user forgot to call MPI_Type_free */
-        OBJ_DESTRUCT(&mca_coll_hcoll_component.derived_types_map);
     }
-
-
     if (cm->using_mem_hooks) {
         opal_mem_hooks_unregister_release(mca_coll_hcoll_mem_release_cb);
     }

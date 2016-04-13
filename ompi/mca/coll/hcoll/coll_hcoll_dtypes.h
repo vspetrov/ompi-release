@@ -61,10 +61,12 @@ static dte_data_representation_t* ompi_datatype_2_dte_data_rep[OPAL_DATATYPE_MAX
 
 static dte_data_representation_t* find_derived_mapping(ompi_datatype_t *dtype){
     dte_data_representation_t *dte;
-    int ret = opal_hash_table_get_value_uint32(&mca_coll_hcoll_component.derived_types_map,
-                                               dtype->id, (void**)&dte);
-    if (OPAL_SUCCESS == ret) {
-        return dte;
+    if (mca_coll_hcoll_component.mpi_alloc_mem_hook_enabled) {
+        int ret = opal_hash_table_get_value_uint32(&mca_coll_hcoll_component.derived_types_map,
+                                                   dtype->id, (void**)&dte);
+        if (OPAL_SUCCESS == ret) {
+            return dte;
+        }
     }
     return NULL;
 }
